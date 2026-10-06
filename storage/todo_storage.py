@@ -44,7 +44,7 @@ def get_todo(db: Session, todo_id: int) -> Todo | None:
 
     return todo
 
-def add_todo(db: Session, todo: dict[int,Any]) -> Todo:
+def add_todo(db: Session, todo: dict[str,Any]) -> Todo:
     todo = Todo(**todo)
 
     db.add(todo)
@@ -57,7 +57,7 @@ def remove_todo(db: Session, todo: Todo) -> None:
     db.delete(todo)
     db.commit()
 
-def patch_todo(db: Session, todo: Todo, patched_todo: dict[int,Any]) -> Todo:
+def patch_todo(db: Session, todo: Todo, patched_todo: dict[str,Any]) -> Todo:
     for attr, value in patched_todo.items():
         setattr(todo, attr, value)
     db.commit()
