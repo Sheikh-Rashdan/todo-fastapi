@@ -5,8 +5,10 @@ import storage.todo_storage as todo_storage
 todo_router = APIRouter(prefix="/todos", tags=["todos"])
 
 @todo_router.get("", response_model=list[TodoModel])
-def get_todos(limit: int | None = Query(None, ge=1), db = Depends(todo_storage.get_db)):
-    return todo_storage.get_todos(db, limit)
+def get_todos(limit: int | None = Query(None, ge=1),
+              category: str | None = Query(default=None, min_length=1),
+              db = Depends(todo_storage.get_db)):
+    return todo_storage.get_todos(db, limit, category)
 
 def validate_todo(todo_id: int, db = Depends(todo_storage.get_db)):
     todo = todo_storage.get_todo(db, todo_id)
