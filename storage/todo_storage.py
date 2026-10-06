@@ -1,7 +1,7 @@
-from sqlalchemy import Engine, create_engine, String
+from sqlalchemy import Engine, create_engine, String, select, delete, update
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from typing import Any
+from typing import Any, Generator
 
 class Base(DeclarativeBase):
     pass
@@ -17,29 +17,49 @@ class Todo(Base):
 engine: Engine = create_engine("sqlite:///database/todos.db")
 SessionLocal = sessionmaker(bind=engine)
 
-def init_db():
+def init_db() -> None:
     Base.metadata.create_all(bind=engine)
 
-# Remove Later
-todos: dict[int,Any] = {}
-next_index: int = 1
+def get_db() -> Generator[Session,None,None]:
+    db: Session = SessionLocal()
+    try: yield db
+    finally: db.close()
 
-def get_todos() -> list[dict[int,Any]]:
-    return list(todos.values())
+def get_todos(db: Session, limit: int|None = 0) -> list[Todo]:
+    if limit is not None:
+        statement = select(Todo).limit(limit)
+    else:
+        statement = select(Todo)
 
-def get_todo(todo_id: int) -> dict[int,Any] | None:
-    return todos.get(todo_id)
+    result = db.execute(statement)
+    todos = result.scalars().all()
 
-def add_todo(todo: dict[int,Any]) -> dict[int,Any]:
-    global next_index
-    todo["id"] = next_index
-    todos[next_index] = todo
-    next_index += 1
+    return todos
+
+def get_todo(db: Session, todo_id: int) -> Todo | None:
+    statement = select(Todo).where(Todo.id == todo_id)
+    result = db.execute(statement)
+    todo = result.scalar()
+
     return todo
 
-def remove_todo(todo_id: int):
-    del todos[todo_id]
+def add_todo(db: Session, todo: dict[int,Any]) -> Todo:
+    todo = Todo(**todo)
 
-def patch_todo(todo_id: int, patched_todo: dict[int,Any]):
-    todo = get_todo(todo_id)
-    todo |= patched_todo
+    db.add(todo)
+    db.commit()
+    db.refresh(todo)
+
+    return todo
+
+def remove_todo(db: Session, todo_id: int) -> None:
+    statement = delete(Todo).where(Todo.id == todo_id)
+    db.execute(statement)
+    db.commit()
+
+def patch_todo(db: Session, todo_id: int, patched_todo: dict[int,Any]) -> Todo:
+    statement = update(Todo).where(Todo.id == todo_id).values(**patched_todo).returning(Todo)
+    result = db.execute(statement)
+    todo = result.scalars().first()
+    db.commit()
+    return todo
