@@ -17,7 +17,7 @@ def validate_todo(todo_id: int, db = Depends(todo_storage.get_db)):
     return todo
 
 @todo_router.get("/{todo_id}", response_model=TodoModel)
-def get_todo(todo = Depends(validate_todo), db = Depends(todo_storage.get_db)):
+def get_todo(todo = Depends(validate_todo)):
     return todo
 
 @todo_router.post("", response_model=TodoModel, status_code=201)
