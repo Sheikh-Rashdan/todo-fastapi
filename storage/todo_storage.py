@@ -1,4 +1,5 @@
 from sqlalchemy import Engine, create_engine, String
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from typing import Any
 
@@ -12,6 +13,14 @@ class Todo(Base):
     task: Mapped[str] = mapped_column(String, nullable=False)
     category: Mapped[str|None] = mapped_column(String, nullable=True)
 
+
+engine: Engine = create_engine("sqlite:///database/todos.db")
+SessionLocal = sessionmaker(bind=engine)
+
+def init_db():
+    Base.metadata.create_all(bind=engine)
+
+# Remove Later
 todos: dict[int,Any] = {}
 next_index: int = 1
 
