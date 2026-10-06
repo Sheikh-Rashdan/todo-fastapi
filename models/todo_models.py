@@ -9,4 +9,6 @@ class TodoCreate(BaseModel):
     category: str | None = None
 
 class TodoModel(TodoCreate):
+    model_config: ConfigDict = ConfigDict(from_attributes=True)
+
     id: int
