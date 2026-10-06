@@ -1,4 +1,16 @@
+from sqlalchemy import Engine, create_engine, String
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from typing import Any
+
+class Base(DeclarativeBase):
+    pass
+
+class Todo(Base):
+    __tablename__ = "todos"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task: Mapped[str] = mapped_column(String, nullable=False)
+    category: Mapped[str|None] = mapped_column(String, nullable=True)
 
 todos: dict[int,Any] = {}
 next_index: int = 1
