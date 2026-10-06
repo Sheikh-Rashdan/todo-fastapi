@@ -52,14 +52,13 @@ def add_todo(db: Session, todo: dict[int,Any]) -> Todo:
 
     return todo
 
-def remove_todo(db: Session, todo_id: int) -> None:
-    statement = delete(Todo).where(Todo.id == todo_id)
-    db.execute(statement)
+def remove_todo(db: Session, todo: Todo) -> None:
+    db.delete(todo)
     db.commit()
 
-def patch_todo(db: Session, todo_id: int, patched_todo: dict[int,Any]) -> Todo:
-    statement = update(Todo).where(Todo.id == todo_id).values(**patched_todo).returning(Todo)
-    result = db.execute(statement)
-    todo = result.scalars().first()
+def patch_todo(db: Session, todo: Todo, patched_todo: dict[int,Any]) -> Todo:
+    for attr, value in patched_todo.items():
+        setattr(todo, attr, value)
     db.commit()
+    db.refresh(todo)
     return todo
