@@ -25,11 +25,12 @@ def get_db() -> Generator[Session,None,None]:
     try: yield db
     finally: db.close()
 
-def get_todos(db: Session, limit: int|None = 0) -> list[Todo]:
+def get_todos(db: Session, limit: int|None = 0, category: str|None = None) -> list[Todo]:
+    statement = select(Todo)
     if limit is not None:
-        statement = select(Todo).limit(limit)
-    else:
-        statement = select(Todo)
+        statement = statement.limit(limit)
+    if category is not None:
+        statement = statement.filter(Todo.category == category)
 
     result = db.execute(statement)
     todos = result.scalars().all()
