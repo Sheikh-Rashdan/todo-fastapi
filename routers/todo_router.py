@@ -30,5 +30,5 @@ def delete_todo(todo = Depends(validate_todo), db = Depends(todo_storage.get_db)
 
 @todo_router.patch("/{todo_id}", response_model=TodoModel)
 def patch_todo(todo_patch: TodoPatch, todo = Depends(validate_todo), db = Depends(todo_storage.get_db)):
-    patched_todo = {k:v for k,v in todo_patch.model_dump().items() if v is not None}
+    patched_todo = {**todo_patch.model_dump(exclude_unset=True)}
     return todo_storage.patch_todo(db, todo, patched_todo)
