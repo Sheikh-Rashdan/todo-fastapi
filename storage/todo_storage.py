@@ -1,6 +1,8 @@
+import os
 from collections.abc import Generator
 from typing import Any
 
+from dotenv import load_dotenv
 from sqlalchemy import Engine, String, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
@@ -17,9 +19,10 @@ class Todo(Base):
     category: Mapped[str | None] = mapped_column(String, nullable=True)
 
 
-engine: Engine = create_engine(
-    "postgresql+psycopg://todo_app:todo-doer@localhost:5432/todo_app"
-)
+load_dotenv()
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+engine: Engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 
 
