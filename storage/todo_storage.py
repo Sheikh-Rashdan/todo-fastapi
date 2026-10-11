@@ -62,8 +62,12 @@ def add_todo(db: Session, todo: dict[str, Any]) -> Todo:
     todo = Todo(**todo)
 
     db.add(todo)
-    db.commit()
-    db.refresh(todo)
+    try:
+        db.commit()
+        db.refresh(todo)
+    except Exception:
+        db.rollback()
+        raise
 
     return todo
 
