@@ -71,12 +71,23 @@ def add_todo(db: Session, todo: dict[str, Any]) -> Todo:
 
 def remove_todo(db: Session, todo: Todo) -> None:
     db.delete(todo)
-    db.commit()
+
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
 
 def patch_todo(db: Session, todo: Todo, patched_todo: dict[str, Any]) -> Todo:
     for attr, value in patched_todo.items():
         setattr(todo, attr, value)
-    db.commit()
-    db.refresh(todo)
+
+    try:
+        db.commit()
+        db.refresh(todo)
+    except Exception:
+        db.rollback()
+        raise
+
     return todo
