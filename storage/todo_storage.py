@@ -36,7 +36,7 @@ def get_db() -> Generator[Session]:
 
 
 def get_todos(
-    db: Session, limit: int | None = 0, category: str | None = None
+    db: Session, limit: int | None = None, category: str | None = None
 ) -> list[Todo]:
     statement = select(Todo)
     if limit is not None:
@@ -44,10 +44,7 @@ def get_todos(
     if category is not None:
         statement = statement.filter(Todo.category == category)
 
-    result = db.execute(statement)
-    todos = result.scalars().all()
-
-    return todos
+    return db.scalars(statement).all()
 
 
 def get_todo(db: Session, todo_id: int) -> Todo | None:
