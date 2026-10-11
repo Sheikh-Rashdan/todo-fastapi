@@ -1,6 +1,6 @@
 # Todo FastAPI
 
-A lightweight Todo API built with FastAPI, SQLAlchemy, and SQLite. It exposes CRUD-style endpoints for managing todo items and is ready to be used with a frontend such as a Vite/React app running on `http://localhost:5173`.
+A lightweight Todo API made with FastAPI, SQLAlchemy, and SQLite, *built to learn FastAPI*. It exposes CRUD-style endpoints for managing todo items and is ready to be used with a frontend such as a Vite/React app running on `http://localhost:5173`.
 
 ## Features
 
