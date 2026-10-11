@@ -17,7 +17,9 @@ class Todo(Base):
     category: Mapped[str | None] = mapped_column(String, nullable=True)
 
 
-engine: Engine = create_engine("sqlite:///database/todos.db")
+engine: Engine = create_engine(
+    "postgresql+psycopg://todo_app:todo-doer@localhost:5432/todo_app"
+)
 SessionLocal = sessionmaker(bind=engine)
 
 
