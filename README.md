@@ -1,14 +1,15 @@
 # Todo FastAPI
 
-A lightweight Todo API made with FastAPI, SQLAlchemy, and SQLite, *built to learn FastAPI*. It exposes CRUD-style endpoints for managing todo items and is ready to be used with a frontend such as a Vite/React app running on `http://localhost:5173`.
+A lightweight Todo API made with FastAPI and SQLAlchemy, *built to learn FastAPI*. It exposes CRUD-style endpoints for managing todo items and is ready to be used with a frontend such as a Vite/React app running on `http://localhost:5173`.
 
 ## Features
 
 - Create, read, update, and delete todo items
-- SQLite persistence via SQLAlchemy
+- PostgreSQL persistence via SQLAlchemy and Psycopg
 - FastAPI automatic request validation
 - CORS configured for local frontend development
-- Optional category filtering when listing todos
+- Optional category and result-limit filtering when listing todos
+- Database connection configured through an environment variable
 - Simple project structure suitable for learning and extension
 
 ## Tech Stack
@@ -16,21 +17,22 @@ A lightweight Todo API made with FastAPI, SQLAlchemy, and SQLite, *built to lear
 - Python 3.14+
 - FastAPI
 - SQLAlchemy
-- SQLite
+- PostgreSQL
+- Psycopg
+- `uv` (recommended)
 
 ## Project Structure
 
 ```text
 .
-├── database/
-│   └── todos.db              # SQLite database file
 ├── models/
 │   └── todo_models.py        # Pydantic request/response models
 ├── routers/
 │   └── todo_router.py        # Todo routes and validation
 ├── storage/
-│   └── todo_storage.py       # SQLAlchemy models and database helpers
+│   └── todo_storage.py       # SQLAlchemy models and PostgreSQL helpers
 ├── main.py                   # FastAPI application entry point
+├── .env.example              # Database URL template
 ├── pyproject.toml            # Project metadata and dependencies
 ├── uv.lock                   # Locked dependency file
 └── README.md                 # Project documentation
@@ -41,6 +43,7 @@ A lightweight Todo API made with FastAPI, SQLAlchemy, and SQLite, *built to lear
 ### Prerequisites
 
 - Python 3.14 or newer
+- PostgreSQL with a database and user created for the app
 - `uv` (recommended, as this project includes a `uv.lock` file)
 
 ### Install dependencies
@@ -49,7 +52,15 @@ A lightweight Todo API made with FastAPI, SQLAlchemy, and SQLite, *built to lear
 uv sync
 ```
 
-If you are using the existing virtual environment instead of `uv`, make sure the project dependencies are installed there as well.
+### Configure the database
+
+Copy `.env.example` to `.env` and replace the placeholders with the connection details for your PostgreSQL database:
+
+```dotenv
+DATABASE_URL="postgresql+psycopg://<username>:<password>@<host>:<port>/<database>"
+```
+
+For example, a local PostgreSQL server might use `localhost:5432`. The database and user must already exist; on startup, the app creates the `todos` table if it is missing. Keep `.env` private and do not commit it.
 
 ## Run the API
 
@@ -157,13 +168,9 @@ curl -X PATCH "http://127.0.0.1:8000/todos/1" \
 
 ## Database
 
-This project uses SQLite with the database file stored at:
+The app connects to PostgreSQL using `DATABASE_URL` from `.env`. The SQLAlchemy connection uses the Psycopg driver (`postgresql+psycopg://`). Database tables are automatically initialized on application startup via `init_db()` in `main.py`.
 
-```text
-database/todos.db
-```
-
-The database is automatically initialized on application startup via `init_db()` in `main.py`.
+The connection URL format is `postgresql+psycopg://username:password@host:port/database`. If your username or password contains URL-reserved characters, URL-encode those parts of the URL.
 
 ## Notes
 
